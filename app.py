@@ -5,9 +5,7 @@ import numpy as np
 
 # Load the pipeline and encoders (if necessary)
 pipe = pickle.load(open('pipe.pkl', 'rb'))
-# Assuming you have label encoders or one-hot encoders for categorical variables
-label_encoder_team = pickle.load(open('team_encoder.pkl', 'rb'))  # Example
-label_encoder_city = pickle.load(open('city_encoder.pkl', 'rb'))  # Example
+
 
 teams = ['Australia', 'India', 'Bangladesh', 'New Zealand', 'South Africa', 
          'England', 'West Indies', 'Afghanistan', 'Pakistan', 'Sri Lanka']
