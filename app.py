@@ -2,10 +2,12 @@ import streamlit as st
 import pickle
 import pandas as pd
 import numpy as np
-import xgboost
-from xgboost import XGBRegressor
 
+# Load the pipeline and encoders (if necessary)
 pipe = pickle.load(open('pipe.pkl', 'rb'))
+# Assuming you have label encoders or one-hot encoders for categorical variables
+label_encoder_team = pickle.load(open('team_encoder.pkl', 'rb'))  # Example
+label_encoder_city = pickle.load(open('city_encoder.pkl', 'rb'))  # Example
 
 teams = ['Australia', 'India', 'Bangladesh', 'New Zealand', 'South Africa', 
          'England', 'West Indies', 'Afghanistan', 'Pakistan', 'Sri Lanka']
@@ -43,12 +45,18 @@ last_five = st.number_input('Runs scored in last 5 overs', min_value=0, step=1, 
 if st.button('Predict Score'):
     balls_left = 120 - (overs * 6)
     wickets_left = 10 - wickets
-    crr = current_score / overs
+    crr = current_score / overs if overs > 0 else 0
+
+    # Encode the categorical features (using the encoders)
+    encoded_batting_team = label_encoder_team.transform([batting_team])[0]
+    encoded_bowling_team = label_encoder_team.transform([bowling_team])[0]
+    encoded_city = label_encoder_city.transform([city])[0]
 
     input_df = pd.DataFrame(
-        {'batting_team': [batting_team], 'bowling_team': [bowling_team],
-         'city': [city], 'current_score': [current_score], 'balls_left': [balls_left],
-         'wickets_left': [wickets], 'crr': [crr], 'last_five': [last_five]})
-    
+        {'batting_team': [encoded_batting_team], 'bowling_team': [encoded_bowling_team],
+         'city': [encoded_city], 'current_score': [current_score], 'balls_left': [balls_left],
+         'wickets_left': [wickets_left], 'crr': [crr], 'last_five': [last_five]})
+
+    # Predict the result
     result = pipe.predict(input_df)
     st.header("Predicted Score - " + str(int(result[0])))
